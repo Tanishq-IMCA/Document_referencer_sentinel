@@ -253,7 +253,7 @@ function AnimatedScoreDisplay({ label, value, delay = 0 }: { label: string; valu
         const t = s / steps;
         const eased = 1 - Math.pow(1 - t, 3);
         setDisplayVal(Math.round(value * eased));
-        if (s >= steps) { setDisplayVal(value); clearInterval(iv); }
+        if (s >= steps) { setDisplayVal(Math.round(value)); clearInterval(iv); }
       }, stepMs);
       return () => clearInterval(iv);
     }, delay * 1000);
@@ -438,8 +438,8 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                     {[
                       { label: 'Sections', value: scan.architectureDetails.layerBreakdown.length },
                       { label: 'Lines', value: scan.metrics.linesOfCode.toLocaleString() },
-                      { label: 'Readability', value: `${scan.codeQualityScore}%` },
-                      { label: 'Avg Sentence', value: scan.metrics.avgComplexity },
+                      { label: 'Readability', value: `${Math.round(scan.codeQualityScore)}%` },
+                      { label: 'Avg Sentence', value: scan.metrics.avgComplexity.toFixed(1) },
                       { label: 'Paragraphs', value: scan.metrics.paragraphs },
                     ].map((m, i) => (
                       <motion.div
@@ -523,7 +523,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
               <div className="p-8 border border-white/10 bg-white/5">
                 <h3 className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-6">Key Insights</h3>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                  {result.keyPoints.map((point, i) => (
+                  {result.keyPoints.filter((p) => p && p.trim()).map((point, i) => (
                     <li key={i} className="flex gap-4 group">
                       <span className="text-[var(--accent)] text-[10px] mt-1 shrink-0">{String(i + 1).padStart(2, '0')}</span>
                       <span className="text-sm text-white/70 group-hover:text-white transition-colors">{formatCitations(point)}</span>
@@ -666,8 +666,8 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                   <div className="grid grid-cols-2 gap-2.5">
                     <TestMetricCard icon={BarChart3} label="Sentences" value={`${scan.codeQualityDetails.complexityDist.reduce((a, b) => a + b.count, 0)}`} sub="total" color="var(--accent)" delay={0.2} />
                     <TestMetricCard icon={CheckSquare} label="Paragraphs" value={`${scan.metrics.paragraphs}`} sub="blocks" color="#4ade80" delay={0.25} />
-                    <TestMetricCard icon={FileCode} label="Avg Words" value={`${scan.metrics.avgComplexity}`} sub="per sentence" color="#facc15" delay={0.3} />
-                    <TestMetricCard icon={BookOpen} label="Doc Score" value={`${scan.codeQualityScore}`} sub="/100" color="#60a5fa" delay={0.35} />
+                    <TestMetricCard icon={FileCode} label="Avg Words" value={`${scan.metrics.avgComplexity.toFixed(1)}`} sub="per sentence" color="#facc15" delay={0.3} />
+                    <TestMetricCard icon={BookOpen} label="Doc Score" value={`${Math.round(scan.codeQualityScore)}`} sub="/100" color="#60a5fa" delay={0.35} />
                   </div>
                 </motion.div>
               </div>
@@ -770,7 +770,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                   ].map((s, i) => (
                     <div key={s.label} className="text-center">
                       <motion.span className="text-3xl text-white block mb-1" style={{ fontFamily: 'var(--font-display)' }} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06, duration: 0.4 }}>
-                        {s.value}
+                        {Math.round(s.value)}
                       </motion.span>
                       <span className="text-[11px] uppercase tracking-[0.18em] text-white/25" style={{ fontFamily: 'var(--font-mono)' }}>{s.label}</span>
                       <div className="mt-2">
@@ -808,7 +808,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                         />
                       </div>
                       <span className="text-[11px] text-white/30 w-8 text-right" style={{ fontFamily: 'var(--font-mono)' }}>{layer.files}</span>
-                      <span className="text-[11px] text-white/40 w-6 text-right" style={{ fontFamily: 'var(--font-mono)' }}>{layer.score}</span>
+                      <span className="text-[11px] text-white/40 w-6 text-right" style={{ fontFamily: 'var(--font-mono)' }}>{Math.round(layer.score)}</span>
                     </div>
                   ))}
                 </div>
