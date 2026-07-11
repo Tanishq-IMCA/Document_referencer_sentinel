@@ -1,0 +1,84 @@
+OK so new project real quick keep it nice and simple No need to overcomplicate it I have provided you with nearly everything that we We're going to keep the back end simple but really clever and really logical So if it ends up being Thousands of lines of code I don't mind But try to keep it normal size. Anyways im adding the folder reffiles
+
+i need you to look into it for my old project UI and follow that ui. 
+
+use the landing page used in there for the scanner.
+
+make the wallpaper purple themed or aka make the website webapp purple accent themed instead.
+
+give the app the name SENTINEL and change title and taglines accordingly. 
+
+change the homepage accordingly (the info related to our app not the layout) 
+
+we are not pursuing user sign in system so no sign in system but rather direct drag and drop type section where we can do these following things.
+
+this is what the software is supposed to do.
+
+1. Upload PDFs
+2. Upload Images (JPG, PNG)
+3. Extract text from PDFs
+4. OCR scanned images if images are uploaded rather than documents. 
+5. Generate summaries based on that.
+6. Choose summary length before generating (Short/Medium/Long)
+7. Show key points
+
+
+so keep it simple yes but landing page first.. Then button in it as it already has so edit what it says but then make it redirect it to a new page where we can drag and drop files or file and summarise.
+
+use a intelligent system for summarizing properly.
+
+suggest me first what ways we can use so this software can work offline for summarizing...
+
+can we make it happen with ml or do we need to do it online cloud based (app will be cloud so dw)
+
+okay so what do we do.
+
+u tell me first..
+
+also the page we will be making for files it should be uh... inspired by our homepage or the dashboard we have in that ui i uploaded inr effiles folder.
+
+keep it simple. remove stuff which isnt needed...
+
+adjust the website simply to our apps preferneces n stuff. dont add or keep unecessary pages..
+
+at the bottom add the project details and who made it.
+
+i made it so include Tanishq Giri
+include my education Vishwakarma University AIDS department (artificial intelligence and data science) and also um the whole deal in the footer saying all rights and reserved IMCA
+
+n all that cuz my company is imca.
+
+okay also add a disclaimer that this is for Vishwakarma university Project but in a professional manner.
+
+ez pz...
+
+keep all this at the bottom of our landing page.
+
+about us at the header should take us at the bottom section
+
+Ez pz..
+
+storage.. handle it in client browser storage..
+
+settings add settings tab and a progress bar of total files scanned, total words scanned and thats it.
+
+but make sure that storage total out of used sotrage cache in browsaer is shown..
+
+total documents scanned too and js simple metrics..
+
+also um.. when we do give the summary make sure to give good insights.. thats all.
+
+
+
+add my github link with a clickable icon n stuff..
+
+also add my email. Tanishq.wanderer@gmail.com
+
+at the end js make a main.py file for running this project all together w backend and  frontend to run this project properly.
+
+
+keep it simple and or use less tokens and directly code. 
+
+more doing less talking/ thinking
+
+but make it exceptional.

@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: scan
+    description: Document scanning operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /scan:
+    post:
+      operationId: scanDocument
+      tags: [scan]
+      summary: Scan a document
+      description: Extracts text from an uploaded PDF or image, then summarizes it and returns key points.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ScanInput"
+      responses:
+        "200":
+          description: Scan result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResult"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +60,42 @@ components:
           type: string
       required:
         - status
+    ScanInput:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+        length:
+          type: string
+          enum: [short, medium, long]
+    ScanResult:
+      type: object
+      required:
+        - filename
+        - text
+        - summary
+        - keyPoints
+        - wordCount
+      properties:
+        filename:
+          type: string
+        text:
+          type: string
+        summary:
+          type: string
+        keyPoints:
+          type: array
+          items:
+            type: string
+        wordCount:
+          type: integer
+    ScanError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
 

@@ -1,0 +1,1 @@
+- [Node PDF/OCR document intelligence stack](node-pdf-ocr-stack.md) — pdf-parse v2 + tesseract.js + @napi-rs/canvas quirks when bundling with esbuild in the api-server artifact.

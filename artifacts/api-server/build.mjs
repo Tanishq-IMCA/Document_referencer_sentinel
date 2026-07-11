@@ -33,6 +33,13 @@ async function buildAll() {
       "better-sqlite3",
       "sqlite3",
       "canvas",
+      "@napi-rs/canvas",
+      // pdf-parse resolves its pdf.worker.mjs relative to its own package
+      // location at runtime; bundling it breaks that resolution.
+      "pdf-parse",
+      // tesseract.js dynamically loads worker/language-data files relative
+      // to its own package location; keep it external for the same reason.
+      "tesseract.js",
       "bcrypt",
       "argon2",
       "fsevents",
