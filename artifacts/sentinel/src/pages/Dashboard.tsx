@@ -6,108 +6,9 @@ import {
   BarChart3, Clock,
 } from 'lucide-react';
 import GlitchyText from '@/components/ui/GlitchyText';
+import AnalysisDashboard from '@/components/AnalysisDashboard';
 import { useScanDocument } from '@workspace/api-client-react';
 import type { ScanResult } from '@workspace/api-client-react';
-
-// --- Rich text helpers: paragraphs, tables, citations ------------------------
-
-function formatCitations(text: string): React.ReactNode[] {
-  const citationRegex = /(\[\d+(?:\s*[\,\-]\s*\d+)*\])|(\(\s*[A-Z][a-zA-Z\s.&]+(?:\s+et\s+al\.)?,\s*\d{4}[a-z]?\s*\))/g;
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = citationRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
-    parts.push(<span key={match.index} className="text-[var(--accent)] font-medium">{match[0]}</span>);
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return parts.length ? parts : [text];
-}
-
-interface TableData {
-  headers: string[];
-  rows: string[][];
-}
-
-function parseTableBlock(block: string): TableData | null {
-  const lines = block.split('\n').map((l) => l.trim()).filter((l) => l);
-  if (lines.length < 2) return null;
-
-  // Markdown-style tables
-  if (lines.every((l) => l.includes('|'))) {
-    const cells = lines.map((l) => l.split('|').map((c) => c.trim()).filter((c) => c !== ''));
-    if (cells.length >= 2 && cells.every((r) => r.length === cells[0].length && cells[0].length >= 2)) {
-      const isSeparator = cells[1].every((c) => /^[-:]+$/.test(c));
-      const headers = cells[0];
-      const rows = isSeparator ? cells.slice(2) : cells.slice(1);
-      if (rows.length >= 1) return { headers, rows };
-    }
-  }
-
-  // Tab-delimited
-  const tabRows = lines.map((l) => l.split('\t').map((c) => c.trim()).filter((c) => c !== ''));
-  if (tabRows.length >= 2 && tabRows.every((r) => r.length === tabRows[0].length && tabRows[0].length >= 2)) {
-    return { headers: tabRows[0], rows: tabRows.slice(1) };
-  }
-
-  // Space-aligned tables (2 or more spaces between columns)
-  const spaceRows = lines.map((l) => l.trim().split(/\s{2,}/).map((c) => c.trim()).filter((c) => c !== ''));
-  if (spaceRows.length >= 2 && spaceRows.every((r) => r.length === spaceRows[0].length && spaceRows[0].length >= 2)) {
-    const avg = spaceRows.flat().reduce((sum, c) => sum + c.length, 0) / spaceRows.flat().length;
-    if (avg > 2) return { headers: spaceRows[0], rows: spaceRows.slice(1) };
-  }
-
-  return null;
-}
-
-function TableView({ data }: { data: TableData }) {
-  return (
-    <div className="overflow-x-auto my-4 border border-white/10">
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="bg-white/5 border-b border-white/10">
-            {data.headers.map((h, i) => (
-              <th key={i} className="px-4 py-2 text-[var(--accent)] uppercase tracking-wider text-[10px] font-normal">{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.rows.map((row, i) => (
-            <tr key={i} className="border-b border-white/5 last:border-0">
-              {row.map((cell, j) => <td key={j} className="px-4 py-2 text-white/70 font-mono">{cell}</td>)}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function RichText({ text, mode }: { text: string; mode: 'paragraphs' | 'pre' }) {
-  if (!text) return null;
-  const blocks = text.split(/\n\s*\n/).filter((b) => b.trim());
-  return (
-    <div className="space-y-4">
-      {blocks.map((block, idx) => {
-        const table = parseTableBlock(block);
-        if (table) return <TableView key={idx} data={table} />;
-        if (mode === 'pre') {
-          return <pre key={idx} className="whitespace-pre-wrap font-mono text-white/40 text-[12px] leading-relaxed">{formatCitations(block)}</pre>;
-        }
-        const sentences = block.replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+(?=[A-Z0-9"'])/).filter((s) => s.trim());
-        if (sentences.length === 0) {
-          return <p key={idx} className="text-white/80 leading-relaxed text-sm">{formatCitations(block)}</p>;
-        }
-        return (
-          <div key={idx} className="space-y-3">
-            {sentences.map((s, i) => <p key={i} className="text-white/80 leading-relaxed text-sm">{formatCitations(s)}</p>)}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 const METRICS_KEY = 'sentinel_metrics';
 
@@ -268,58 +169,10 @@ export default function Dashboard() {
                 )}
               </motion.div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="space-y-8"
-              >
-                {/* Result Header */}
-                <div className="flex justify-between items-end border-b border-white/10 pb-6">
-                  <div>
-                    <button
-                      onClick={() => { setResult(null); setFile(null); }}
-                      className="text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-[var(--accent)] flex items-center gap-2 mb-4 transition-colors"
-                    >
-                      <ArrowLeft size={12} /> New Analysis
-                    </button>
-                    <h2 className="text-3xl uppercase tracking-[0.1em]">{result.filename}</h2>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">Words Scanned</p>
-                    <p className="text-2xl text-[var(--accent)]">{result.wordCount}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-8">
-                  {/* Neural Summary */}
-                  <div className="p-8 border border-white/10 bg-white/2 relative">
-                    <div className="absolute top-0 left-0 w-1 h-8 bg-[var(--accent)]" />
-                    <h3 className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-6">Neural Summary</h3>
-                    <RichText text={result.summary} mode="paragraphs" />
-                  </div>
-
-                  {/* Key Insights */}
-                  <div className="p-8 border border-white/10 bg-white/5">
-                    <h3 className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-6">Key Insights</h3>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                      {result.keyPoints.map((point, i) => (
-                        <li key={i} className="flex gap-4 group">
-                          <span className="text-[var(--accent)] text-[10px] mt-1 shrink-0">0{i + 1}</span>
-                          <span className="text-sm text-white/70 group-hover:text-white transition-colors">{formatCitations(point)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Extracted Data */}
-                  <div className="p-8 border border-white/10 bg-white/2">
-                    <h3 className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-6">Extracted Data</h3>
-                    <div className="max-h-[500px] overflow-y-auto pr-4 scrollbar-thin">
-                      <RichText text={result.text} mode="pre" />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+              <AnalysisDashboard
+                result={result}
+                onReset={() => { setResult(null); setFile(null); }}
+              />
             )}
           </div>
         ) : (
