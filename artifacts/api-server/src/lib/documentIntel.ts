@@ -41,11 +41,22 @@ function wordFrequencies(sentences: string[]): Map<string, number> {
   return freq;
 }
 
+function isHeaderLike(sentence: string): boolean {
+  const s = sentence.trim();
+  if (s.length < 20) return true;
+  // Section markers: "1. Introduction", "Conclusion", "References", "Methodology"
+  if (/^\d+[.):\]]?\s*[A-Z][a-zA-Z\s]{0,30}$/.test(s)) return true;
+  if (/^[A-Z][A-Z\s]{0,40}$/.test(s)) return true;
+  if (/[:\?]\s*$/.test(s) && s.split(/\s+/).length < 8) return true;
+  return false;
+}
+
 function scoreSentences(
   sentences: string[],
   freq: Map<string, number>,
 ): number[] {
   return sentences.map((sentence, index) => {
+    if (isHeaderLike(sentence)) return 0;
     const words = tokenize(sentence);
     if (words.length === 0) return 0;
     const raw = words.reduce((sum, w) => sum + (freq.get(w) ?? 0), 0);

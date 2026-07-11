@@ -79,14 +79,14 @@ export interface DocumentAnalysis {
   };
 }
 
-const EMAIL_REGEX = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
-const PHONE_REGEX = /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g;
-const SSN_REGEX = /\b\d{3}-\d{2}-\d{4}\b/g;
+const EMAIL_REGEX = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/gi;
+const PHONE_REGEX = /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4,6}\b/g;
+const SSN_REGEX = /\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/g;
 const CREDIT_CARD_REGEX = /\b(?:\d[ -]*?){13,16}\b/g;
-const SECRET_REGEX = /\b(?:api[_-]?key|token|secret|password|sk-)\s*[:=]\s*["']?[a-zA-Z0-9_\-]{8,}\b/gi;
+const SECRET_REGEX = /\b(?:api[_-]?key|token|secret|password|sk-|auth|bearer|access[_-]?key)\s*[:=\s]\s*["']?[a-zA-Z0-9_\-]{8,}\b/gi;
 const URL_REGEX = /\bhttps?:\/\/[^\s]+/gi;
 const DATE_REGEX = /\b(?:\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4})\b/gi;
-const MONEY_REGEX = /\b(?:\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+\s*(?:USD|EUR|GBP))\b/gi;
+const MONEY_REGEX = /\b(?:\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+\s*(?:USD|EUR|GBP|INR|₹|€|£))\b/gi;
 const ORG_REGEX = /\b(?:Inc\.|LLC|Ltd\.|Corp\.|Corporation|Company|Co\.|Organization|Institute|University|Agency|Department)\b/gi;
 
 function clamp(n: number, min = 0, max = 100) {
@@ -134,6 +134,8 @@ function averageSentenceLength(sentences: string[]): number {
 function extractFindings(text: string, filename: string): Finding[] {
   const findings: Finding[] = [];
   const seen = new Set<string>();
+  // Normalize whitespace so regexes can match across line breaks.
+  const normalized = text.replace(/\s+/g, " ").trim();
 
   const add = (
     regex: RegExp,
@@ -145,17 +147,18 @@ function extractFindings(text: string, filename: string): Finding[] {
   ) => {
     regex.lastIndex = 0;
     let m: RegExpExecArray | null;
-    while ((m = regex.exec(text)) !== null) {
-      const key = `${title}:${m.index}`;
+    while ((m = regex.exec(normalized)) !== null) {
+      const match = m[0].trim();
+      const key = `${title}:${match}`;
       if (seen.has(key)) continue;
       seen.add(key);
       findings.push({
         id: `f-${findings.length + 1}`,
         severity,
         title,
-        description: description(m[0]),
+        description: description(match),
         file: filename,
-        line: lineNumber(text, m.index),
+        line: lineNumber(normalized, m.index),
         tool,
         recommendation,
       });
