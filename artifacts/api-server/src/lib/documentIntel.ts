@@ -64,6 +64,12 @@ const TARGET_SENTENCE_COUNT: Record<SummaryLength, (total: number) => number> = 
   long: (total) => Math.max(5, Math.round(total * 0.35)),
 };
 
+const KEY_POINT_LIMIT: Record<SummaryLength, number> = {
+  short: 5,
+  medium: 8,
+  long: 10,
+};
+
 export function summarizeText(
   text: string,
   length: SummaryLength = "medium",
@@ -90,7 +96,7 @@ export function summarizeText(
     .sort((a, b) => a.index - b.index)
     .map((r) => r.sentence);
 
-  const keyPointCount = Math.min(5, ranked.length);
+  const keyPointCount = Math.min(KEY_POINT_LIMIT[length], ranked.length);
   const keyPoints = ranked
     .slice(0, keyPointCount)
     .sort((a, b) => a.index - b.index)

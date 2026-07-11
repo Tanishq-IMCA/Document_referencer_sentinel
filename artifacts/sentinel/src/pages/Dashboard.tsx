@@ -120,7 +120,7 @@ export default function Dashboard() {
       } else if (apiDone) {
         finish(apiResult, apiError);
       } else {
-        setLogs((prev) => [...prev, '> finalizing...']);
+        setLogs((prev) => [...prev, '> It\'s taking longer than anticipated.. please wait']);
         const wait = setInterval(() => {
           if (apiDone) {
             clearInterval(wait);
