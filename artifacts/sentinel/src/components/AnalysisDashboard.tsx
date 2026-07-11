@@ -5,8 +5,9 @@ import {
   CheckCircle2, AlertCircle, AlertTriangle, Info,
   ChevronDown, ChevronRight, TrendingUp, TrendingDown, Minus,
   TestTube, CheckSquare, XCircle, Flame,
-  BarChart3, FileCode, BookOpen,
+  BarChart3, FileCode, BookOpen, Download,
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
 import type { ScanResult } from '@workspace/api-client-react';
 import { analyzeDocument, type DocumentAnalysis, type SeverityLevel } from '@/lib/documentAnalysis';
 import GlitchyText from '@/components/ui/GlitchyText';
@@ -135,6 +136,159 @@ const tabIcons: Record<Tab, React.ElementType> = {
   Structure: Layers,
   Entities: Brain,
 };
+
+const ACCENT = [168, 85, 247] as const;
+
+function downloadReport(result: ScanResult, scan: DocumentAnalysis) {
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  const contentW = pageW - margin * 2;
+  let y = margin;
+
+  const setPurple = () => doc.setTextColor(ACCENT[0], ACCENT[1], ACCENT[2]);
+  const setWhite = () => doc.setTextColor(255, 255, 255);
+  const setGray = (level: number) => doc.setTextColor(level, level, level);
+
+  const drawLine = (yy: number) => {
+    doc.setDrawColor(ACCENT[0], ACCENT[1], ACCENT[2]);
+    doc.setLineWidth(0.35);
+    doc.line(margin, yy, pageW - margin, yy);
+  };
+
+  const drawProgress = (label: string, value: number, yy: number) => {
+    doc.setFontSize(8);
+    setWhite();
+    doc.text(label, margin, yy);
+    doc.text(`${Math.round(value)}`, pageW - margin, yy, { align: 'right' });
+    const barY = yy + 2;
+    doc.setFillColor(255, 255, 255);
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.2);
+    doc.setFillColor(255, 255, 255);
+    doc.setFillColor(255, 255, 255);
+    doc.setFillColor(30, 30, 35);
+    doc.roundedRect(margin, barY, contentW, 3, 0.5, 0.5, 'F');
+    const fillW = (contentW * Math.min(value, 100)) / 100;
+    doc.setFillColor(ACCENT[0], ACCENT[1], ACCENT[2]);
+    doc.roundedRect(margin, barY, fillW, 3, 0.5, 0.5, 'F');
+    return yy + 8;
+  };
+
+  const addWrapped = (text: string, yy: number, size = 9, lineHeight = 4.5, color = 200) => {
+    doc.setFontSize(size);
+    setGray(color);
+    const split = doc.splitTextToSize(text, contentW);
+    doc.text(split, margin, yy);
+    return yy + split.length * lineHeight;
+  };
+
+  const addSectionTitle = (title: string, yy: number) => {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    setWhite();
+    doc.text(title.toUpperCase(), margin, yy);
+    doc.setFont('helvetica', 'normal');
+    drawLine(yy + 2);
+    return yy + 7;
+  };
+
+  // Header
+  doc.setFillColor(5, 8, 22);
+  doc.rect(0, 0, pageW, pageH, 'F');
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  setPurple();
+  doc.text('S', margin, y + 2);
+  doc.setFontSize(14);
+  setWhite();
+  doc.text('SENTINEL', margin + 7, y + 2);
+  doc.setFontSize(8);
+  setGray(120);
+  doc.text('DOCUMENT INTELLIGENCE REPORT', pageW - margin, y + 2, { align: 'right' });
+  y += 10;
+  drawLine(y);
+  y += 8;
+
+  // Document info
+  doc.setFontSize(10);
+  setWhite();
+  doc.setFont('helvetica', 'bold');
+  doc.text(result.filename, margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  setGray(140);
+  doc.text(`Scanned on ${scan.scanDate} · ${result.wordCount.toLocaleString()} words · ${Math.max(1, Math.round(result.wordCount / 200))} min read`, margin, y + 4.5);
+  y += 12;
+
+  // Score overview
+  y = addSectionTitle('Document Scores', y);
+  y = drawProgress('Overall', scan.overallScore, y);
+  y = drawProgress('Privacy', scan.securityScore, y);
+  y = drawProgress('Clarity', scan.codeQualityScore, y);
+  y = drawProgress('Structure', scan.architectureScore, y);
+  y = drawProgress('Entities', scan.skillScore, y);
+  y += 4;
+
+  // Summary
+  y = addSectionTitle('Neural Summary', y);
+  y = addWrapped(result.summary, y, 9, 4.5, 190);
+  y += 4;
+
+  // Key Insights
+  if (result.keyPoints.length > 0) {
+    y = addSectionTitle('Key Insights', y);
+    result.keyPoints.filter((p) => p && p.trim()).forEach((point, i) => {
+      if (y > pageH - margin - 20) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.setFontSize(8);
+      setPurple();
+      doc.text(`${String(i + 1).padStart(2, '0')}`, margin, y);
+      y = addWrapped(point, y, 8.5, 4, 200);
+      y += 2;
+    });
+    y += 4;
+  }
+
+  // Sensitivity
+  if (scan.findings.length > 0) {
+    if (y > pageH - margin - 40) {
+      doc.addPage();
+      y = margin;
+    }
+    y = addSectionTitle('Sensitivity Findings', y);
+    scan.findings.forEach((finding) => {
+      if (y > pageH - margin - 25) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      setWhite();
+      doc.text(`${finding.severity.toUpperCase()} — ${finding.title}`, margin, y);
+      doc.setFont('helvetica', 'normal');
+      y = addWrapped(finding.description, y + 3.5, 8, 3.5, 170);
+      y += 3;
+    });
+  }
+
+  // Footer / page numbers
+  const totalPages = (doc.internal.pages.length || 1) - 1;
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7);
+    setGray(100);
+    doc.text('SENTINEL DOCUMENT INTELLIGENCE', margin, pageH - 8);
+    doc.text(`Page ${i} of ${totalPages}`, pageW - margin, pageH - 8, { align: 'right' });
+    drawLine(pageH - 12);
+  }
+
+  doc.save(`sentinel-report-${result.filename.replace(/\.[^/.]+$/, '')}.pdf`);
+}
 
 function useCountUp(target: number, delay: number, duration = 1.2) {
   const [count, setCount] = useState(0);
@@ -352,7 +506,14 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
             Document scan complete · {scan.scanDate}
           </p>
         </div>
-        <div className="flex gap-6">
+        <div className="flex items-center gap-6">
+          <button
+            onClick={() => downloadReport(result, scan)}
+            className="flex items-center gap-2 px-4 py-2 border border-[var(--accent)]/30 text-[var(--accent)] text-[10px] uppercase tracking-[0.2em] hover:bg-[var(--accent)]/10 transition-colors"
+            style={{ borderRadius: '1px' }}
+          >
+            <Download size={14} /> Report
+          </button>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">Words Scanned</p>
             <p className="text-2xl text-[var(--accent)]">{result.wordCount}</p>
