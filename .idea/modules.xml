@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Document_referencer_sentinel.iml" filepath="$PROJECT_DIR$/.idea/Document_referencer_sentinel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/document-referencer-sentinel.iml" filepath="$PROJECT_DIR$/.idea/document-referencer-sentinel.iml" />
     </modules>
   </component>
 </project>
