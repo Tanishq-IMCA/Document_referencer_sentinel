@@ -106,7 +106,7 @@ function RichText({ text, mode }: { text: string; mode: 'paragraphs' | 'pre' }) 
 
 // ── Visualisation components (adapted from the RepoSight dashboard) ────────
 
-const TABS = ['Overview', 'Security', 'Code Quality', 'Architecture', 'Skills'] as const;
+const TABS = ['Overview', 'Privacy', 'Clarity', 'Structure', 'Entities'] as const;
 type Tab = typeof TABS[number];
 
 const severityConfig: Record<SeverityLevel, { color: string; bg: string; border: string; icon: React.ElementType; label: string }> = {
@@ -130,10 +130,10 @@ const trendIcon = (v: number) =>
 
 const tabIcons: Record<Tab, React.ElementType> = {
   Overview: Layout,
-  Security: Shield,
-  'Code Quality': Code2,
-  Architecture: Layers,
-  Skills: Brain,
+  Privacy: Shield,
+  Clarity: Code2,
+  Structure: Layers,
+  Entities: Brain,
 };
 
 function useCountUp(target: number, delay: number, duration = 1.2) {
@@ -403,9 +403,9 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
               {/* Score grid */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                  { label: 'Overall Score', value: Math.round(scan.overallScore), delay: 0 },
-                  { label: 'Security', value: Math.round(scan.securityScore), delay: 0.06 },
-                  { label: 'Readability', value: Math.round(scan.codeQualityScore), delay: 0.12 },
+                  { label: 'Overall', value: Math.round(scan.overallScore), delay: 0 },
+                  { label: 'Privacy', value: Math.round(scan.securityScore), delay: 0.06 },
+                  { label: 'Clarity', value: Math.round(scan.codeQualityScore), delay: 0.12 },
                   { label: 'Structure', value: Math.round(scan.architectureScore), delay: 0.18 },
                   { label: 'Entities', value: Math.round(scan.skillScore), delay: 0.24 },
                 ].map((item) => (
@@ -438,7 +438,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                     {[
                       { label: 'Sections', value: scan.architectureDetails.layerBreakdown.length },
                       { label: 'Lines', value: scan.metrics.linesOfCode.toLocaleString() },
-                      { label: 'Readability', value: `${Math.round(scan.codeQualityScore)}%` },
+                      { label: 'Clarity', value: `${Math.round(scan.codeQualityScore)}%` },
                       { label: 'Avg Sentence', value: scan.metrics.avgComplexity.toFixed(1) },
                       { label: 'Paragraphs', value: scan.metrics.paragraphs },
                     ].map((m, i) => (
@@ -469,8 +469,8 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                   <div className="space-y-4">
                     {[
                       { label: 'Overall', value: Math.round(scan.overallScore) },
-                      { label: 'Security', value: Math.round(scan.securityScore) },
-                      { label: 'Readability', value: Math.round(scan.codeQualityScore) },
+                      { label: 'Privacy', value: Math.round(scan.securityScore) },
+                      { label: 'Clarity', value: Math.round(scan.codeQualityScore) },
                       { label: 'Structure', value: Math.round(scan.architectureScore) },
                       { label: 'Entities', value: Math.round(scan.skillScore) },
                     ].map((s, i) => (
@@ -489,7 +489,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                 style={{ borderRadius: '1px' }}
               >
                 <div className="text-[11px] uppercase tracking-[0.28em] text-white/25 mb-4" style={{ fontFamily: 'var(--font-mono)' }}>
-                  Finding Summary
+                  Sensitivity Summary
                 </div>
                 <div className="grid grid-cols-4 gap-3">
                   {(['critical', 'high', 'medium', 'low'] as SeverityLevel[]).map((sev) => {
@@ -535,7 +535,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
           )}
 
           {/* ── SECURITY TAB ── */}
-          {activeTab === 'Security' && (
+          {activeTab === 'Privacy' && (
             <div className="space-y-3">
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-[11px] uppercase tracking-[0.28em] text-white/25" style={{ fontFamily: 'var(--font-mono)' }}>
@@ -543,7 +543,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                 </span>
                 <div className="flex-1 h-px bg-white/[0.05]" />
                 <span className="text-[11px] text-white/20" style={{ fontFamily: 'var(--font-mono)' }}>
-                  PII + Secret Scanner
+                  Sensitive Data Scanner
                 </span>
               </div>
               {scan.findings.length === 0 && (
@@ -614,7 +614,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
           )}
 
           {/* ── CODE QUALITY TAB ── */}
-          {activeTab === 'Code Quality' && (
+          {activeTab === 'Clarity' && (
             <div className="space-y-4">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -624,15 +624,15 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                 style={{ borderRadius: '1px' }}
               >
                 <div className="text-[11px] uppercase tracking-[0.28em] text-white/25 mb-5" style={{ fontFamily: 'var(--font-mono)' }}>
-                  Quality Metrics
+                  Clarity Metrics
                 </div>
                 <div className="space-y-4">
                   {[
-                    { label: 'Readability', value: Math.round(scan.codeQualityScore) },
-                    { label: 'Doc Coverage', value: Math.round(scan.codeQualityDetails.docCoverage) },
+                    { label: 'Clarity', value: Math.round(scan.codeQualityScore) },
+                    { label: 'Coverage', value: Math.round(scan.codeQualityDetails.docCoverage) },
                     { label: 'Consistency', value: Math.round(scan.codeQualityDetails.consistencyScore) },
-                    { label: 'Review Score', value: Math.round(scan.codeQualityDetails.reviewScore) },
-                    { label: 'Test Quality', value: Math.round(scan.codeQualityDetails.testQuality) },
+                    { label: 'Quality', value: Math.round(scan.codeQualityDetails.reviewScore) },
+                    { label: 'Balance', value: Math.round(scan.codeQualityDetails.testQuality) },
                   ].map((m, i) => (
                     <SegmentBar key={m.label} label={m.label} value={m.value} segments={24} segmentHeight={8} delay={i * 0.07} labelWidth={120} />
                   ))}
@@ -681,7 +681,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                   style={{ borderRadius: '1px' }}
                 >
                   <div className="text-[11px] uppercase tracking-[0.28em] text-white/25 mb-4" style={{ fontFamily: 'var(--font-mono)' }}>
-                    Readability Issues
+                    Clarity Issues
                   </div>
                   <div className="space-y-2.5">
                     {scan.codeSmells.map((smell, i) => {
@@ -749,7 +749,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
           )}
 
           {/* ── ARCHITECTURE TAB ── */}
-          {activeTab === 'Architecture' && (
+          {activeTab === 'Structure' && (
             <div className="space-y-4">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -884,7 +884,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                     style={{ borderRadius: '1px' }}
                   >
                     <div className="text-[11px] uppercase tracking-[0.28em] text-white/25 mb-3" style={{ fontFamily: 'var(--font-mono)' }}>
-                      Anti-Patterns
+                      Weak Signals
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {scan.architectureDetails.antiPatterns.map((p, i) => (
@@ -907,7 +907,7 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
           )}
 
           {/* ── SKILLS TAB ── */}
-          {activeTab === 'Skills' && (
+          {activeTab === 'Entities' && (
             <div className="space-y-4">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
