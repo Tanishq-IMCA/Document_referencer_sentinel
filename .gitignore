@@ -47,3 +47,11 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Reference / agent / runtime residue
+.agents/
+.migration-backup/
+attached_assets/
+screenshots/
+artifacts/reffiles/
+reffiles/
