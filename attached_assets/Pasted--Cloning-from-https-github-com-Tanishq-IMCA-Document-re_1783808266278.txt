@@ -1,0 +1,24 @@
+==> Cloning from https://github.com/Tanishq-IMCA/Document_referencer_sentinel
+==> Checking out commit 8b3568278b33ff0b7066f6aef1d6ef0a94cbcc72 in branch main
+==> Using Node.js version 24.14.1 (default)
+==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+==> Running build command 'pnpm install --frozen-lockfile; pnpm --filter @workspace/sentinel run build'...
+> @workspace/sentinel@0.0.0 build /opt/render/project/src/artifacts/sentinel
+> vite build --config vite.config.ts
+failed to load config from /opt/render/project/src/artifacts/sentinel/vite.config.ts
+error during build:
+Error: Invalid PORT value: "/"
+    at file:///opt/render/project/src/artifacts/sentinel/node_modules/.vite-temp/vite.config.ts.timestamp-1783808217848-dfd4c69092b62.mjs:11:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:430:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:661:26)
+    at async loadConfigFromBundledFile (file:///opt/render/project/src/node_modules/.pnpm/vite@7.3.6_@types+node@25.9.4_jiti@2.7.0_lightningcss@1.32.0_tsx@4.23.0_yaml@2.9.0/node_modules/vite/dist/node/chunks/config.js:35996:12)
+    at async bundleAndLoadConfigFile (file:///opt/render/project/src/node_modules/.pnpm/vite@7.3.6_@types+node@25.9.4_jiti@2.7.0_lightningcss@1.32.0_tsx@4.23.0_yaml@2.9.0/node_modules/vite/dist/node/chunks/config.js:35884:17)
+    at async loadConfigFromFile (file:///opt/render/project/src/node_modules/.pnpm/vite@7.3.6_@types+node@25.9.4_jiti@2.7.0_lightningcss@1.32.0_tsx@4.23.0_yaml@2.9.0/node_modules/vite/dist/node/chunks/config.js:35851:42)
+    at async resolveConfig (file:///opt/render/project/src/node_modules/.pnpm/vite@7.3.6_@types+node@25.9.4_jiti@2.7.0_lightningcss@1.32.0_tsx@4.23.0_yaml@2.9.0/node_modules/vite/dist/node/chunks/config.js:35500:22)
+    at async createBuilder (file:///opt/render/project/src/node_modules/.pnpm/vite@7.3.6_@types+node@25.9.4_jiti@2.7.0_lightningcss@1.32.0_tsx@4.23.0_yaml@2.9.0/node_modules/vite/dist/node/chunks/config.js:33955:19)
+    at async CAC.<anonymous> (file:///opt/render/project/src/node_modules/.pnpm/vite@7.3.6_@types+node@25.9.4_jiti@2.7.0_lightningcss@1.32.0_tsx@4.23.0_yaml@2.9.0/node_modules/vite/dist/node/cli.js:629:10)
+/opt/render/project/src/artifacts/sentinel:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/sentinel@0.0.0 build: `vite build --config vite.config.ts`
+Exit status 1
+==> Build failed 😞
+==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
