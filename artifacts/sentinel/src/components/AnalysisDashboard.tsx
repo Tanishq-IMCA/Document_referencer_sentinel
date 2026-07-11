@@ -403,11 +403,11 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
               {/* Score grid */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                  { label: 'Overall Score', value: scan.overallScore, delay: 0 },
-                  { label: 'Security', value: scan.securityScore, delay: 0.06 },
-                  { label: 'Readability', value: scan.codeQualityScore, delay: 0.12 },
-                  { label: 'Structure', value: scan.architectureScore, delay: 0.18 },
-                  { label: 'Entities', value: scan.skillScore, delay: 0.24 },
+                  { label: 'Overall Score', value: Math.round(scan.overallScore), delay: 0 },
+                  { label: 'Security', value: Math.round(scan.securityScore), delay: 0.06 },
+                  { label: 'Readability', value: Math.round(scan.codeQualityScore), delay: 0.12 },
+                  { label: 'Structure', value: Math.round(scan.architectureScore), delay: 0.18 },
+                  { label: 'Entities', value: Math.round(scan.skillScore), delay: 0.24 },
                 ].map((item) => (
                   <motion.div
                     key={item.label}
@@ -468,11 +468,11 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                   </div>
                   <div className="space-y-4">
                     {[
-                      { label: 'Overall', value: scan.overallScore },
-                      { label: 'Security', value: scan.securityScore },
-                      { label: 'Readability', value: scan.codeQualityScore },
-                      { label: 'Structure', value: scan.architectureScore },
-                      { label: 'Entities', value: scan.skillScore },
+                      { label: 'Overall', value: Math.round(scan.overallScore) },
+                      { label: 'Security', value: Math.round(scan.securityScore) },
+                      { label: 'Readability', value: Math.round(scan.codeQualityScore) },
+                      { label: 'Structure', value: Math.round(scan.architectureScore) },
+                      { label: 'Entities', value: Math.round(scan.skillScore) },
                     ].map((s, i) => (
                       <SegmentBar key={s.label} label={s.label} value={s.value} segments={16} segmentHeight={7} delay={0.3 + i * 0.06} labelWidth={80} />
                     ))}
@@ -628,11 +628,11 @@ export default function AnalysisDashboard({ result, onReset }: AnalysisDashboard
                 </div>
                 <div className="space-y-4">
                   {[
-                    { label: 'Readability', value: scan.codeQualityScore },
-                    { label: 'Doc Coverage', value: scan.codeQualityDetails.docCoverage },
-                    { label: 'Consistency', value: scan.codeQualityDetails.consistencyScore },
-                    { label: 'Review Score', value: scan.codeQualityDetails.reviewScore },
-                    { label: 'Test Quality', value: scan.codeQualityDetails.testQuality },
+                    { label: 'Readability', value: Math.round(scan.codeQualityScore) },
+                    { label: 'Doc Coverage', value: Math.round(scan.codeQualityDetails.docCoverage) },
+                    { label: 'Consistency', value: Math.round(scan.codeQualityDetails.consistencyScore) },
+                    { label: 'Review Score', value: Math.round(scan.codeQualityDetails.reviewScore) },
+                    { label: 'Test Quality', value: Math.round(scan.codeQualityDetails.testQuality) },
                   ].map((m, i) => (
                     <SegmentBar key={m.label} label={m.label} value={m.value} segments={24} segmentHeight={8} delay={i * 0.07} labelWidth={120} />
                   ))}

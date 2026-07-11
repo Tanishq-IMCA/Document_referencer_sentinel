@@ -34,7 +34,7 @@ function useCountUp(target: number, delay: number, duration = 1.2) {
         const eased = 1 - Math.pow(1 - t, 3);
         setCount(Math.round(target * eased));
         if (step >= steps) {
-          setCount(target);
+          setCount(Math.round(target));
           clearInterval(intervalRef.current!);
         }
       }, stepDuration);
